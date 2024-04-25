@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Request</h1>
+    <p>Request method: {{ request.method }}</p>
+    <p>Request path: {{ request.path }}</p>
+    <p>Request query string: {{ request.query_string }}</p>
+    <p>Request headers:</p>
+    <ul>
+        {% for key, value in request.headers.items() %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

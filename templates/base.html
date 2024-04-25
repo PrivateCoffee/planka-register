@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app }} - {{ title }}</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>{{ app }}</h1>
+        </div>
+    </header>
+    <section class="hero">
+        <div class="container">
+            <h2>{{ title }}</h2>
+            <p>{{ subtitle }}</p>
+        </div>
+    </section>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Private.coffee</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
