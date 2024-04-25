@@ -1,14 +1,15 @@
-{% extends "base.html" %}
-
-{% block content %}
-    <h1>Request</h1>
-    <p>Request method: {{ request.method }}</p>
-    <p>Request path: {{ request.path }}</p>
-    <p>Request query string: {{ request.query_string }}</p>
-    <p>Request headers:</p>
-    <ul>
-        {% for key, value in request.headers.items() %}
-            <li>{{ key }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
+{% extends "base.html" %} {% block content %}
+<main>
+  <div class="container">
+    <p>Please enter your email address to request a Planka account.</p>
+    <p>
+      You will receive an email with a verification link, where you can complete
+      your registration.
+    </p>
+    <form>
+      <input type="email" name="email" placeholder="Email address" required />
+      <button type="submit">Request</button>
+    </form>
+  </div>
+</main>
 {% endblock %}
