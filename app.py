@@ -110,7 +110,12 @@ def process_request(request):
     count = cursor.fetchone()[0]
 
     if count > 0:
-        return render_template("already_requested.html")
+        return render_template(
+            "already_requested.html",
+            app=config["App"]["name"],
+            title="Already Requested",
+            subtitle="You have already requested access with this email address.",
+        )
 
     token = str(uuid.uuid4())
 

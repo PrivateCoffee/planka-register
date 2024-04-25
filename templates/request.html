@@ -1,15 +1,25 @@
 {% extends "base.html" %} {% block content %}
-<main>
-  <div class="container">
-    <p>Please enter your email address to request a Planka account.</p>
-    <p>
-      You will receive an email with a verification link, where you can complete
-      your registration.
-    </p>
-    <form method="post">
-      <input type="email" name="email" placeholder="Email address" required />
-      <button type="submit">Request</button>
-    </form>
-  </div>
-</main>
+<div class="container">
+  <p>Please enter your email address to request a Planka account.</p>
+  <p>
+    You will receive an email with a verification link, where you can complete
+    your registration.
+  </p>
+  <br />
+  <p>
+    <small>
+      <strong>Privacy notice:</strong>
+      After submitting your email address, we will send you a verification link
+      to complete your registration. We will not use your email address for any
+      other purpose. Your email address and IP address will be stored in our
+      database for 48 hours for the purposes of processing your registration and
+      preventing abuse. After 48 hours, or upon completion of your registration,
+      your email address and IP address will be deleted from this database.
+    </small>
+  </p>
+  <form method="post">
+    <input type="email" name="email" placeholder="Email address" required />
+    <button type="submit">Request</button>
+  </form>
+</div>
 {% endblock %}
