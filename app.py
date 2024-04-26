@@ -28,7 +28,7 @@ if config.getboolean("App", "debug", fallback=False):
     app.debug = True
 
 if config.getboolean("App", "proxyfix", fallback=False):
-    app.wsgi_app = ProxyFix(app.wsgi_app)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
 
 
 def initialize_database():
