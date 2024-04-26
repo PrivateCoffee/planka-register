@@ -18,8 +18,12 @@
     </small>
   </p>
   <form method="post">
-    <input type="email" name="email" placeholder="Email address" required />
-    <button type="submit">Request</button>
+    {{ form.hidden_tag() }} {{ form.email.label }}: {{ form.email(size=20) }}<br />
+    {% for error in form.email.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+    <br />
+    {{ form.submit() }}
   </form>
 </div>
 {% endblock %}

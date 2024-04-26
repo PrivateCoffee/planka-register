@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <p>Please fill the form below to sign up on our Planka instance.</p>
+  <br />
+  <p>
+    <small>
+      <strong>Privacy notice:</strong>
+      The provided data will be stored in our database to allow you to log in to
+      our Planka instance. Your data will not be used for any other purpose.
+      Note that your name will be visible to other users of the Planka instance.
+    </small>
+  </p>
+  <form method="post">
+    {{ form.hidden_tag() }} {{ form.email.label }}: {{ form.email(size=20, disabled="disabled", value=email) }}<br />
+    {% for error in form.email.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+    <br />
+    {{ form.name.label }}: {{ form.name(size=20) }}<br />
+    {% for error in form.name.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+    <br />
+    {{ form.username.label }}: {{ form.username(size=20) }}<br />
+    {% for error in form.username.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+    <br />
+    {{ form.password.label }}: {{ form.password(size=20) }}<br />
+    {% for error in form.password.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+    {{ form.submit() }}
+  </form>
+</div>
+{% endblock %}

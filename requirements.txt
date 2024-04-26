@@ -1,2 +1,4 @@
 Flask
+Flask-WTF
+email-validator
 git+https://git.private.coffee/PrivateCoffee/plankapy.git
