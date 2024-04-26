@@ -7,11 +7,13 @@
       <strong>Privacy notice:</strong>
       The provided data will be stored in our database to allow you to log in to
       our Planka instance. Your data will not be used for any other purpose.
-      Note that your name will be visible to other users of the Planka instance.
+      Note that your name, email address and any other data you add to your
+      profile will be visible to other users of the Planka instance.
     </small>
   </p>
   <form method="post">
-    {{ form.hidden_tag() }} {{ form.email.label }}: {{ form.email(size=20, disabled="disabled", value=email) }}<br />
+    {{ form.hidden_tag() }} {{ form.email.label }}: {{ form.email(size=20,
+    disabled="disabled", value=email) }}<br />
     {% for error in form.email.errors %}
     <span style="color: red">[{{ error }}]</span>
     {% endfor %}
@@ -29,8 +31,7 @@
     {{ form.password.label }}: {{ form.password(size=20) }}<br />
     {% for error in form.password.errors %}
     <span style="color: red">[{{ error }}]</span>
-    {% endfor %}
-    {{ form.submit() }}
+    {% endfor %} {{ form.submit() }}
   </form>
 </div>
 {% endblock %}

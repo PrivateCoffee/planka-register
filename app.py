@@ -1,11 +1,13 @@
-from flask import Flask, request, redirect, url_for, render_template
+from flask import Flask, request, redirect, url_for, render_template, jsonify
 from plankapy import Planka, User, InvalidToken
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, Email, ValidationError
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from configparser import ConfigParser
 from random import SystemRandom
+from typing import List, Tuple
 
 import sqlite3
 import smtplib
@@ -21,6 +23,12 @@ app.config["SECRET_KEY"] = "".join(
 
 config = ConfigParser()
 config.read("settings.ini")
+
+if config.getboolean("App", "debug", fallback=False):
+    app.debug = True
+
+if config.getboolean("App", "proxyfix", fallback=False):
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
 def initialize_database():
@@ -49,7 +57,7 @@ def rate_limit(request):
         """
         SELECT COUNT(*)
         FROM requests
-        WHERE ip = ? AND created_at > datetime('now', '-1 hour')
+        WHERE ip = ? AND created_at > datetime('now', '-1 day')
     """,
         (request.remote_addr,),
     )
@@ -74,6 +82,16 @@ def get_mailserver():
 
     mailserver.login(config["SMTP"]["username"], config["SMTP"]["password"])
     return mailserver
+
+
+def get_footer_links() -> List[Tuple[str, str]]:
+    links = []
+
+    if "Footer" in config.sections():
+        for key in config["Footer"]:
+            links.append((key.capitalize(), config["Footer"][key]))
+
+    return links
 
 
 def send_email(email, token):
@@ -126,6 +144,7 @@ def process_request(request):
             app=config["App"]["name"],
             title="Already Requested",
             subtitle="You have already requested access with this email address.",
+            footer_links=get_footer_links(),
         )
 
     token = str(uuid.uuid4())
@@ -154,7 +173,13 @@ class EmailForm(FlaskForm):
 @app.route("/", methods=["GET", "POST"])
 def start_request():
     if rate_limit(request):
-        return render_template("rate_limit.html")
+        return render_template(
+            "rate_limit.html",
+            app=config["App"]["name"],
+            title="Rate Limited",
+            subtitle="You have reached the rate limit for requests. Please try again later.",
+            footer_links=get_footer_links(),
+        )
 
     form = EmailForm()
 
@@ -167,6 +192,7 @@ def start_request():
         title="Request Access",
         subtitle="Please enter your email address to request access.",
         form=form,
+        footer_links=get_footer_links(),
     )
 
 
@@ -177,6 +203,7 @@ def post_request():
         app=config["App"]["name"],
         title="Request Received",
         subtitle="Your request has been received. Please check your email for further instructions.",
+        footer_links=get_footer_links(),
     )
 
 
@@ -186,8 +213,6 @@ class SignupForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Submit")
-
-    email.render_kw = {"readonly": True}
 
     def validate_username(self, field):
         planka = Planka(
@@ -231,6 +256,7 @@ def confirm_request(token):
             app=config["App"]["name"],
             title="Invalid Token",
             subtitle="The token you provided is invalid.",
+            footer_links=get_footer_links(),
         )
 
     email = row[0]
@@ -252,7 +278,22 @@ def confirm_request(token):
             email=email,
         )
 
-        users.create(new_user)
+        try:
+            users.create(new_user)
+        except InvalidToken:
+            form.password.errors.append(
+                "Your password did not meet Planka's requirements. Please try again."
+            )
+
+            return render_template(
+                "signup.html",
+                app=config["App"]["name"],
+                title="Complete Signup",
+                subtitle="Please confirm your email address by filling out the form below.",
+                email=email,
+                form=form,
+                footer_links=get_footer_links(),
+            )
 
         cursor.execute(
             """
@@ -274,6 +315,7 @@ def confirm_request(token):
         subtitle="Please confirm your email address by filling out the form below.",
         email=email,
         form=form,
+        footer_links=get_footer_links(),
     )
 
 
@@ -285,7 +327,26 @@ def post_signup():
         title="Signup Complete",
         subtitle="Your account has been created. You may now log in.",
         planka=config["Planka"]["url"],
+        footer_links=get_footer_links(),
     )
+
+
+@app.route("/cron")
+def cron():
+    conn = sqlite3.connect("db.sqlite3")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        DELETE FROM requests
+        WHERE created_at < datetime('now', '-2 day')
+    """
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status": "ok"})
 
 
 initialize_database()

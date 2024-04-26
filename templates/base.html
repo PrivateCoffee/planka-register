@@ -4,7 +4,7 @@
     <meta charset="utf8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ app }} - {{ title }}</title>
-    <link rel="stylesheet" href="static/style.css" />
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
     <header>
@@ -22,7 +22,9 @@
     <footer>
       <div class="container">
         <p>
-          &copy; 2024 Private.coffee |
+          &copy; 2024 Private.coffee {% for link in footer_links %} |
+          <a href="{{ link.1 }}">{{ link.0 }}</a>
+          {% endfor %} |
           <a href="https://git.private.coffee/PrivateCoffee/planka-register"
             >Git</a
           >
