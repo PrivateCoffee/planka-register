@@ -198,7 +198,9 @@ class EmailForm(FlaskForm):
         users = User(planka)
 
         try:
-            user = users.get(email=field.data)
+            user_list = users.get()
+
+            user = next((u for u in user_list if u["email"] == field.data), None)
 
             if user:
                 raise ValidationError(
