@@ -169,6 +169,45 @@ class EmailForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     submit = SubmitField("Submit")
 
+    def validate_email(self, field):
+        conn = sqlite3.connect("db.sqlite3")
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM requests
+            WHERE email = ?
+        """,
+            (field.data,),
+        )
+
+        count = cursor.fetchone()[0]
+
+        conn.close()
+
+        if count > 0:
+            raise ValidationError("This email address has already been used.")
+
+        planka = Planka(
+            url=config["Planka"]["url"],
+            username=config["Planka"]["username"],
+            password=config["Planka"]["password"],
+        )
+
+        users = User(planka)
+
+        try:
+            user = users.get(email=field.data)
+
+            if user:
+                raise ValidationError(
+                    f"This email address is already associated with a user. Please log in instead."
+                )
+
+        except InvalidToken:
+            pass
+
 
 @app.route("/", methods=["GET", "POST"])
 def start_request():
